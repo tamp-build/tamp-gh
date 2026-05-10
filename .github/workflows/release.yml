@@ -57,23 +57,25 @@ jobs:
       - name: List packages
         run: ls -la ./artifacts/
 
-      # Secret-name fallback chain: matches tamp-gitversion@cf15ff5.
+      # The diagnostic step surfaces missing / rotated secrets fast
+      # (char count only, no value leak) rather than letting an empty
+      # key fall through into the Push step.
       - name: Diagnostics — secret presence check
         if: ${{ github.event_name == 'push' || inputs.dry_run == false }}
         env:
-          NUGET_API_KEY: ${{ secrets.tmap_nuget_api_key || secrets.tamp_nuget_api_key || secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ secrets.tamp_nuget_api_key }}
         run: |
           if [ -n "$NUGET_API_KEY" ]; then
             echo "NUGET_API_KEY is set (${#NUGET_API_KEY} chars)."
           else
-            echo "::error::NUGET_API_KEY is empty. Org secret resolution failed."
+            echo "::error::NUGET_API_KEY is empty. Check the tamp_nuget_api_key org secret."
             exit 1
           fi
 
       - name: tamp Push
         if: ${{ github.event_name == 'push' || inputs.dry_run == false }}
         env:
-          NUGET_API_KEY: ${{ secrets.tmap_nuget_api_key || secrets.tamp_nuget_api_key || secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ secrets.tamp_nuget_api_key }}
         run: dotnet tamp Push
 
       - name: Dry-run summary
