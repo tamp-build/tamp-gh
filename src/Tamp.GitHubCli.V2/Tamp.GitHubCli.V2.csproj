@@ -8,7 +8,6 @@
 
   <PropertyGroup Label="Package">
     <PackageId>Tamp.GitHubCli.V2</PackageId>
-    <Version>0.0.1-alpha</Version>
     <Description>Tamp wrapper for the GitHub CLI (gh, current major V2). Sub-facades for release / pr / issue / api — covers the common build-script ship pipeline.</Description>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
