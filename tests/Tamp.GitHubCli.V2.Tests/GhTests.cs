@@ -40,11 +40,14 @@ public sealed class GhTests
     [Fact]
     public void Every_Verb_Uses_Tool_Path_As_Executable()
     {
-        var tool = new Tool(AbsolutePath.Create("/usr/local/bin/gh"));
-        Assert.Equal("/usr/local/bin/gh", GhRelease.Create(tool, s => s.SetTag("v1")).Executable);
-        Assert.Equal("/usr/local/bin/gh", GhPr.Create(tool).Executable);
-        Assert.Equal("/usr/local/bin/gh", GhIssue.List(tool).Executable);
-        Assert.Equal("/usr/local/bin/gh", GhApi.Request(tool, s => s.SetEndpoint("user")).Executable);
+        // AbsolutePath normalizes per-OS (drive letter on Windows), so compare against
+        // the post-normalization value rather than a hardcoded POSIX shape.
+        var path = AbsolutePath.Create("/usr/local/bin/gh");
+        var tool = new Tool(path);
+        Assert.Equal(path.Value, GhRelease.Create(tool, s => s.SetTag("v1")).Executable);
+        Assert.Equal(path.Value, GhPr.Create(tool).Executable);
+        Assert.Equal(path.Value, GhIssue.List(tool).Executable);
+        Assert.Equal(path.Value, GhApi.Request(tool, s => s.SetEndpoint("user")).Executable);
     }
 
     // ================================================================

@@ -18,17 +18,19 @@ public sealed class GhIntegrationTests
 
     private static Tool ResolveTool()
     {
-        // gh installs to /usr/local/bin or /opt/homebrew/bin on macOS,
-        // /usr/bin on Linux.
-        foreach (var p in new[]
+        // Walk PATH — handles every OS/install combo (Homebrew on macOS, apt/dnf on
+        // Linux, the GitHub-Runners pre-installed gh on every runner image, winget
+        // / Chocolatey / Program Files on Windows).
+        var pathVar = Environment.GetEnvironmentVariable("PATH") ?? "";
+        var separator = OperatingSystem.IsWindows() ? ';' : ':';
+        var executable = OperatingSystem.IsWindows() ? "gh.exe" : "gh";
+        foreach (var dir in pathVar.Split(separator, StringSplitOptions.RemoveEmptyEntries))
         {
-            "/usr/local/bin/gh",
-            "/opt/homebrew/bin/gh",
-            "/usr/bin/gh",
-        })
-            if (File.Exists(p)) return new Tool(AbsolutePath.Create(p));
+            var candidate = Path.Combine(dir, executable);
+            if (File.Exists(candidate)) return new Tool(AbsolutePath.Create(candidate));
+        }
         throw new InvalidOperationException(
-            "gh not found in any expected location. Install: https://cli.github.com/");
+            "gh not found on PATH. Install: https://cli.github.com/");
     }
 
     private CaptureResult Run(CommandPlan plan)
