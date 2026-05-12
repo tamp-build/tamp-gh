@@ -117,14 +117,13 @@ public sealed class GhTests
     [Fact]
     public void ReleaseCreate_AddFiles_From_AbsolutePath_Sequence_Round_Trips()
     {
-        var paths = new[]
-        {
-            AbsolutePath.Create("/abs/a.nupkg"),
-            AbsolutePath.Create("/abs/b.nupkg"),
-        };
-        var args = GhRelease.Create(FakeTool(), s => s.SetTag("v1").AddFiles(paths)).Arguments;
-        Assert.Equal("/abs/a.nupkg", args[3]);
-        Assert.Equal("/abs/b.nupkg", args[4]);
+        // AbsolutePath normalizes per-OS (drive letter on Windows); compare against
+        // post-normalization values rather than the hardcoded POSIX shape.
+        var a = AbsolutePath.Create("/abs/a.nupkg");
+        var b = AbsolutePath.Create("/abs/b.nupkg");
+        var args = GhRelease.Create(FakeTool(), s => s.SetTag("v1").AddFiles(new[] { a, b })).Arguments;
+        Assert.Equal(a.Value, args[3]);
+        Assert.Equal(b.Value, args[4]);
     }
 
     [Fact]
