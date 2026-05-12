@@ -63,6 +63,11 @@ jobs:
         run: dotnet build Tamp.GitHubCli.slnx --no-restore --configuration Release
 
       - name: Test
+        env:
+          # Integration tests shell out to `gh api` against PUBLIC endpoints, but the gh
+          # CLI still requires authentication (exit 4 otherwise). The runner's automatic
+          # GITHUB_TOKEN gives us auth + a generous rate-limit budget on api.github.com.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: dotnet test Tamp.GitHubCli.slnx --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
 
       - name: Upload test results
