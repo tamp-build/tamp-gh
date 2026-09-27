@@ -7,7 +7,7 @@ namespace Tamp.GitHubCli.V2;
 /// <para>
 /// <see cref="Repo"/> (<c>--repo OWNER/REPO</c>) is supported by every
 /// resource verb (release / pr / issue) but NOT by <c>gh api</c>, which
-/// uses <see cref="Hostname"/> instead and embeds the path directly.
+/// uses <c>Hostname</c> instead and embeds the path directly.
 /// </para>
 /// <para>
 /// Authentication is via the <c>GH_TOKEN</c> / <c>GITHUB_TOKEN</c>
